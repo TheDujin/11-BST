@@ -223,6 +223,7 @@ void print(BinaryNode* root) {
 	}
 	else
 		cout << "Right child: None" << endl;
+	cout << endl;
 	if (left)
 		print(root->getLeft());
 	if (right)
