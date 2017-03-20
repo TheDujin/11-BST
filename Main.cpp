@@ -18,6 +18,7 @@ void add(BinaryNode* & root, int newNode);
 //void pop_off(int* & heap, int iterator);
 //void down_heap(int* & heap, int pos, int iterator);
 void print(BinaryNode* root);
+void remove(BinaryNode* root, int target);
 
 //Main method which does pretty much everything
 int main () {
@@ -59,30 +60,24 @@ int main () {
 							isNum = true;
 						}
 						//Otherwise if it's whitespace, add the number to heap and then up-heap.
-//						else if (nums[i] != '\0' && nums[i] != '\n'){
-//							heap[iterator] = temp;
-//							up_heap(heap, iterator);
-//							temp = 0;
-//							iterator++;
-//							isNum = false;
-//						}
+						else if (nums[i] != '\0' && nums[i] != '\n'){
+							add(root, temp);
+							temp = 0;
+							isNum = false;
+						}
 					}
 					//This here is a workaround to deal with loose zeroes being appended to input.
-//					if (isNum) {
-//						heap[iterator] = temp;
-//						up_heap(heap, iterator);
-//						temp = 0;
-//					}
-//					if (!isNum) {
-//						iterator--;
-//					}
-//					//Print the heap.
-//					cout << endl << "This is the heap:" << endl;
-//					print_heap(heap, iterator);
-//					//We make one call to pop-off and we're done.
+					if (isNum) {
+						add(root, temp);
+						temp = 0;
+					}
+					//Print the heap.
+					cout << endl << "This is the binary search tree:" << endl;
+					print(root);
+					//We make one call to pop-off and we're done.
 //					cout << endl << "After sort:" << endl;
 //					pop_off(heap, iterator);
-//
+
 				}
 
 				input.close();
@@ -220,6 +215,7 @@ void print(BinaryNode* root) {
 		cout << "Left child: None" << endl;
 	if (root->getRight() != NULL) {
 		cout << "Right child: " << root->getRight()->getData() << endl;
+		right  = true;
 	}
 	else
 		cout << "Right child: None" << endl;
@@ -228,4 +224,70 @@ void print(BinaryNode* root) {
 		print(root->getLeft());
 	if (right)
 		print(root->getRight());
+}
+
+void remove(BinaryNode* root, int target) {
+	BinaryNode* current = root;
+	BinaryNode* parent = NULL;
+	bool targetIsLeftChild = false;
+	bool hasLeft = false;
+	bool hasRight = false;
+	while (current->getData() != target) {
+		if (target > current->getData()) {
+			if (current->getRight() == NULL) {
+				cout << "A node with value of \" " + target + " \" does not exist in the tree." << endl;
+				return;
+			}
+			else {
+				parent = current;
+				current = current->getRight();
+			}
+		}
+		else {
+			if (current->getLeft() == NULL) {
+				cout << "A node with value of \" " + target + " \" does not exist in the tree." << endl;
+				return;
+			}
+			else {
+				parent = current;
+				current = current->getLeft();
+			}
+		}
+	}
+	cout << "A node with value of \" " + target + " \" was removed from the tree." << endl;
+	if (current->getLeft() != NULL) hasLeft = true;
+	if (current->getRight() != NULL) hasRight = true;
+	if (parent->getLeft() == current) targetIsLeftChild = true;
+	if (hasLeft) {
+		if (!hasRight) {
+			if (targetIsLeftChild) parent->setLeft(current->getLeft());
+			else parent->setRight(current->getLeft());
+			delete current;
+		}
+		else {
+			BinaryNode* rightmost = current->getLeft();
+			BinaryNode* rightmostParent = current;
+			while (rightmost->getRight() != NULL){
+				rightmostParent = rightmost;
+				rightmost = rightmost->getRight();
+			}
+			if (targetIsLeftChild) parent->setLeft(rightmost);
+			else parent->setRight(rightmost);
+			if (rightmostParent != current) rightmostParent->setRight(rightmost->getLeft());
+			rightmost->setLeft(current->getLeft());
+			rightmost->setRight(current->getRight());
+			delete current;
+		}
+	}
+	else if (hasRight) {
+		if (targetIsLeftChild) parent->setLeft(current->getRight());
+		else parent->setRight(current->getRight());
+		delete current;
+	}
+	else {
+		if (targetIsLeftChild) parent->setLeft(NULL);
+		else parent->setRight(NULL);
+		delete current;
+	}
+
 }
