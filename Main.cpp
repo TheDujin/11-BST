@@ -35,7 +35,7 @@ int main () {
 		cin >> choose;
 		cin.ignore(256, '\n');
 		//They gave us valid input, so we ask them for the file.
-		if (choose == 'f') {
+		if (choose == 'f' || choose == 'F') {
 			valid = true;
 			char fileIn[81];
 			cout << "Input the path to the input file." << endl << "Path: ";
@@ -74,6 +74,18 @@ int main () {
 					//Print the heap.
 					cout << endl << "This is the binary search tree:" << endl;
 					print(root);
+					bool isFinished = false;
+					while (!isFinished) {
+					  cout << "Would you like to \"print\" the tree, \"delete\" a node from the tree, or \"continue\"?" << endl << "Input: ";
+					  cin >> choose;
+					  cin.ignore(256, '\n');
+					  if (choose == 'p' || choose == 'P') print(root);
+					  else if (choose == 'd' || choose == 'D') {
+					    cout << "Delete placeholder" << endl;
+					  }
+					  else if (choose == 'c' || choose == 'C') isFinished = true;
+					  else cout << "That input is invalid. Please try again." << endl;
+					}
 					//We make one call to pop-off and we're done.
 //					cout << endl << "After sort:" << endl;
 //					pop_off(heap, iterator);
@@ -85,12 +97,12 @@ int main () {
 			else cout << "Unable to open file";
 		}
 		//If they want to input from console, read their input from console then proceed the exact same way as in file.
-		else if (choose == 'c') {
+		else if (choose == 'c' || choose == 'C') {
 			valid = true;
 			char* nums = new char[501];
 			cout << "Input the numbers, each separated by a space." << endl << "Numbers: ";
 			cin.getline(nums, 500);
-			cout << "File contents:" << endl;
+			cout << "Your input:" << endl;
 			cout << nums;
 			//Creates heap the same way as if input was from file.
 			int temp = 0;
@@ -235,7 +247,7 @@ void remove(BinaryNode* root, int target) {
 	while (current->getData() != target) {
 		if (target > current->getData()) {
 			if (current->getRight() == NULL) {
-				cout << "A node with value of \" " + target + " \" does not exist in the tree." << endl;
+			  cout << "A node with value of \" " << target << " \" does not exist in the tree." << endl;
 				return;
 			}
 			else {
@@ -245,7 +257,7 @@ void remove(BinaryNode* root, int target) {
 		}
 		else {
 			if (current->getLeft() == NULL) {
-				cout << "A node with value of \" " + target + " \" does not exist in the tree." << endl;
+			  cout << "A node with value of \" " << target << " \" does not exist in the tree." << endl;
 				return;
 			}
 			else {
@@ -254,7 +266,7 @@ void remove(BinaryNode* root, int target) {
 			}
 		}
 	}
-	cout << "A node with value of \" " + target + " \" was removed from the tree." << endl;
+	cout << "A node with value of \" " << target << " \" was removed from the tree." << endl;
 	if (current->getLeft() != NULL) hasLeft = true;
 	if (current->getRight() != NULL) hasRight = true;
 	if (parent->getLeft() == current) targetIsLeftChild = true;
