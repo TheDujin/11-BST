@@ -15,28 +15,23 @@ using namespace std;
 
 //Function prototypes
 void add(BinaryNode* & root, int newNode);
-//void pop_off(int* & heap, int iterator);
-//void down_heap(int* & heap, int pos, int iterator);
 void print(BinaryNode* root);
-void remove(BinaryNode* root, int target);
+void remove(BinaryNode* & root, int target);
 
 //Main method which does pretty much everything
 int main () {
-	//Checks for valid input ("file" or "console).
-	bool valid = false;
-	while (!valid) {
-		//Initializes heap as an int* and initialize iterator as a way of finding the size of the heap.
-//		int* heap = new int[101];
-//		int iterator = 0;
+	//Checks for valid input ("file", "console", or "quit").
+	bool running = true;
+	while (running) {
+		//Initializing an empty tree
 		BinaryNode* root = NULL;
 		char choose;
-		//Input the first char of what the user types. If it's a c or f, choose console or file respectively.
-		cout << "Do you want to enter the numbers through the console or through a file?" << endl << "Choose: ";
+		//Input the first char of what the user types. If it's a c, f, or q, choose console, file, or quit respectively.
+		cout << "Do you want to enter the numbers through the \"console\", through a \"file\", or \"quit\" the program?" << endl << "Choose: ";
 		cin >> choose;
 		cin.ignore(256, '\n');
 		//They gave us valid input, so we ask them for the file.
 		if (choose == 'f' || choose == 'F') {
-			valid = true;
 			char fileIn[81];
 			cout << "Input the path to the input file." << endl << "Path: ";
 			cin >> fileIn;
@@ -49,7 +44,7 @@ int main () {
 					input.getline(nums, 500);
 					cout << "File contents:" << endl;
 					cout << nums;
-					//We walk through the input from the file and add numbers as we find them to the heap.
+					//We walk through the input from the file and add numbers as we find them to the BST.
 					int temp = 0;
 					bool isNum = false;
 					//If it's a digit, multiply temp (the preexisting portion of the number) by 10 then add the digit.
@@ -59,7 +54,7 @@ int main () {
 							temp += nums[i] - '0';
 							isNum = true;
 						}
-						//Otherwise if it's whitespace, add the number to heap and then up-heap.
+						//Otherwise if it's whitespace, add the number to the BST.
 						else if (nums[i] != '\0' && nums[i] != '\n'){
 							add(root, temp);
 							temp = 0;
@@ -71,40 +66,41 @@ int main () {
 						add(root, temp);
 						temp = 0;
 					}
-					//Print the heap.
+					//Print the BST.
 					cout << endl << "This is the binary search tree:" << endl;
 					print(root);
 					bool isFinished = false;
+					//While they haven't typed "c" (for continue), we ask them what they want to do with the tree
 					while (!isFinished) {
 					  cout << "Would you like to \"print\" the tree, \"delete\" a node from the tree, or \"continue\"?" << endl << "Input: ";
 					  cin >> choose;
 					  cin.ignore(256, '\n');
 					  if (choose == 'p' || choose == 'P') print(root);
 					  else if (choose == 'd' || choose == 'D') {
-					    cout << "Delete placeholder" << endl;
+						  int target;
+						  //Prompt for a target for deletion
+						  cout << "Please enter the value of the Node you want to delete." << endl << "Target: ";
+						  cin >> target;
+						  remove(root, target);
+
 					  }
 					  else if (choose == 'c' || choose == 'C') isFinished = true;
 					  else cout << "That input is invalid. Please try again." << endl;
 					}
-					//We make one call to pop-off and we're done.
-//					cout << endl << "After sort:" << endl;
-//					pop_off(heap, iterator);
-
 				}
-
+				//Close input
 				input.close();
 			}
-			else cout << "Unable to open file";
+			else cout << "Unable to open file" << endl;
 		}
 		//If they want to input from console, read their input from console then proceed the exact same way as in file.
 		else if (choose == 'c' || choose == 'C') {
-			valid = true;
 			char* nums = new char[501];
 			cout << "Input the numbers, each separated by a space." << endl << "Numbers: ";
 			cin.getline(nums, 500);
 			cout << "Your input:" << endl;
 			cout << nums;
-			//Creates heap the same way as if input was from file.
+			//Creates the BST the same way as if input was from file.
 			int temp = 0;
 			bool isNum = false;
 			for (int i = 0; i < strlen(nums); i++) {
@@ -113,39 +109,53 @@ int main () {
 					temp += nums[i] - '0';
 					isNum = true;
 				}
-//				else if (nums[i] != '\0' && nums[i] != '\n'){
-//					heap[iterator] = temp;
-//					up_heap(heap, iterator);
-//					temp = 0;
-//					iterator++;
-//					isNum = false;
-//				}
+				else if (nums[i] != '\0' && nums[i] != '\n'){
+					add(root, temp);
+					temp = 0;
+					isNum = false;
+				}
 			}
-//			if (isNum) {
-//				heap[iterator] = temp;
-//				up_heap(heap, iterator);
-//				temp = 0;
-//			}
-//			if (!isNum) {
-//				iterator--;
-//			}
-//			cout << "This is the heap:" << endl;
-//			print_heap(heap, iterator);
-//			cout << endl << "After sort:" << endl;
-//			pop_off(heap, iterator);
+			if (isNum) {
+				add(root, temp);
+				temp = 0;
+			}
+			cout << endl << "This is the binary search tree:" << endl;
+			print(root);
+			bool isFinished = false;
+			while (!isFinished) {
+			  cout << "Would you like to \"print\" the tree, \"delete\" a node from the tree, or \"continue\"?" << endl << "Input: ";
+			  cin >> choose;
+			  cin.ignore(256, '\n');
+			  if (choose == 'p' || choose == 'P') print(root);
+			  else if (choose == 'd' || choose == 'D') {
+				  int target;
+				  cout << "Please enter the value of the Node you want to delete." << endl << "Target: ";
+				  cin >> target;
+				  remove(root, target);
+
+			  }
+			  else if (choose == 'c' || choose == 'C') isFinished = true;
+			  else cout << "That input is invalid. Please try again." << endl;
+			}
+
+		}
+		else if (choose == 'q' || choose == 'Q') {
+			running = false;
+			cout << "Ending program..." << endl << "Thanks for using this program!" << endl;
 		}
 		else
 			cout << "That input is invalid." << endl;
 	}
 	return 0;
 }
-//Checks if the specific node in the heap is larger than its parent, and if so switch them and call up-heap recursively.
-//Otherwise if the node is already the root or the node is not larger than parent, do nothing.
+//Add the node to the tree.
 void add(BinaryNode* & root, int newNode) {
 	BinaryNode* current = root;
+	//If tree is empty, root equals the new node
 	if (root == NULL)
 		root = new BinaryNode(newNode);
 	else {
+		//Otherwise, shift left if node is equal to or less than current and shift right otherwise until the end of the tree is reached
 		bool hasAdded = false;
 		while (!hasAdded) {
 			if (newNode > current->getData()) {
@@ -167,87 +177,45 @@ void add(BinaryNode* & root, int newNode) {
 		}
 	}
 }
-////Prints the current root, replaces it with the node at the bottom-right, then down-heaps. Then it recursively calls itself.
-////If iterator is 0 (tree has only one node on it) then print that node.
-//void pop_off(int* & heap, int iterator) {
-//	if (iterator > 0) {
-//		cout << heap[0] << " ";
-//		heap[0] = heap[iterator];
-//		iterator--;
-//		down_heap(heap, 0, iterator);
-//		pop_off(heap, iterator);
-//	}
-//	else
-//		cout << heap[0] << " ";
-//}
-////We take the node and switch it with the larger of its children IF one or more of its children is larger than it.
-////If the node is larger than both of its children or the node is at the bottom-most level of the tree, we do nothing.
-//void down_heap(int* & heap, int pos, int iterator) {
-//	if ((int)log2(pos + 1) < (int)log2(iterator + 1)) {
-//		if (heap[pos] < heap[pos * 2 + 1]) {
-//			if (heap[pos] < heap[pos * 2 + 2]) {
-//				if (heap[pos * 2 + 1] > heap[pos * 2 + 2]) {
-//					int temp = heap[pos];
-//					heap[pos] = heap[pos * 2 + 1];
-//					heap[pos * 2 + 1] = temp;
-//					down_heap(heap, pos * 2 + 1, iterator);
-//				}
-//				else {
-//					int temp = heap[pos];
-//					heap[pos] = heap[pos * 2 + 2];
-//					heap[pos * 2 + 2] = temp;
-//					down_heap(heap, pos * 2 + 2, iterator);
-//				}
-//			}
-//			else {
-//				int temp = heap[pos];
-//				heap[pos] = heap[pos * 2 + 1];
-//				heap[pos * 2 + 1] = temp;
-//				down_heap(heap, pos * 2 + 1, iterator);
-//			}
-//		}
-//		else if (heap[pos] < heap[pos * 2 + 2]) {
-//			int temp = heap[pos];
-//			heap[pos] = heap[pos * 2 + 2];
-//			heap[pos * 2 + 2] = temp;
-//			down_heap(heap, pos * 2 + 2, iterator);
-//		}
-//	}
-//}
-//Prints heap. If the node is on a new layer, add a new line then the node, otherwise add a space then the node.
+//Prints the BST. Prints each node and its children
 void print(BinaryNode* root) {
+	//The function is recursive
 	bool left = false;
 	bool right = false;
-	cout << "Node: " << root->getData() << endl;
-	if (root->getLeft() != NULL) {
-		cout << "Left child: " << root->getLeft()->getData() << endl;
-		left = true;
+	if (root != NULL) {
+		cout << "Node: " << root->getData() << endl;
+		if (root->getLeft() != NULL) {
+			cout << "Left child: " << root->getLeft()->getData() << endl;
+			left = true;
+		}
+		else
+			cout << "Left child: None" << endl;
+		if (root->getRight() != NULL) {
+			cout << "Right child: " << root->getRight()->getData() << endl;
+			right  = true;
+		}
+		else
+			cout << "Right child: None" << endl;
+		cout << endl;
+		if (left)
+			print(root->getLeft());
+		if (right)
+			print(root->getRight());
 	}
-	else
-		cout << "Left child: None" << endl;
-	if (root->getRight() != NULL) {
-		cout << "Right child: " << root->getRight()->getData() << endl;
-		right  = true;
-	}
-	else
-		cout << "Right child: None" << endl;
-	cout << endl;
-	if (left)
-		print(root->getLeft());
-	if (right)
-		print(root->getRight());
+	else cout << "The tree is empty." << endl;
 }
-
-void remove(BinaryNode* root, int target) {
+//Deletes the targeted node, if its exists.
+void remove(BinaryNode* & root, int target) {
 	BinaryNode* current = root;
 	BinaryNode* parent = NULL;
 	bool targetIsLeftChild = false;
 	bool hasLeft = false;
 	bool hasRight = false;
+	//There are just a shit ton of conditions to check. We check all unique ones.
 	while (current->getData() != target) {
 		if (target > current->getData()) {
 			if (current->getRight() == NULL) {
-			  cout << "A node with value of \" " << target << " \" does not exist in the tree." << endl;
+			  cout << "A node with value of \"" << target << "\" does not exist in the tree." << endl;
 				return;
 			}
 			else {
@@ -257,7 +225,7 @@ void remove(BinaryNode* root, int target) {
 		}
 		else {
 			if (current->getLeft() == NULL) {
-			  cout << "A node with value of \" " << target << " \" does not exist in the tree." << endl;
+			  cout << "A node with value of \"" << target << "\" does not exist in the tree." << endl;
 				return;
 			}
 			else {
@@ -266,14 +234,16 @@ void remove(BinaryNode* root, int target) {
 			}
 		}
 	}
-	cout << "A node with value of \" " << target << " \" was removed from the tree." << endl;
+	cout << "A node with value of \"" << target << "\" was removed from the tree." << endl;
 	if (current->getLeft() != NULL) hasLeft = true;
 	if (current->getRight() != NULL) hasRight = true;
-	if (parent->getLeft() == current) targetIsLeftChild = true;
+	if (parent != NULL)
+		if (parent->getLeft() == current) targetIsLeftChild = true;
 	if (hasLeft) {
 		if (!hasRight) {
-			if (targetIsLeftChild) parent->setLeft(current->getLeft());
-			else parent->setRight(current->getLeft());
+			if (targetIsLeftChild && parent != NULL) parent->setLeft(current->getLeft());
+			else if (parent != NULL) parent->setRight(current->getLeft());
+			else root = current->getLeft();
 			delete current;
 		}
 		else {
@@ -283,22 +253,27 @@ void remove(BinaryNode* root, int target) {
 				rightmostParent = rightmost;
 				rightmost = rightmost->getRight();
 			}
-			if (targetIsLeftChild) parent->setLeft(rightmost);
-			else parent->setRight(rightmost);
-			if (rightmostParent != current) rightmostParent->setRight(rightmost->getLeft());
-			rightmost->setLeft(current->getLeft());
+			if (targetIsLeftChild && parent != NULL) parent->setLeft(rightmost);
+			else if (parent!= NULL) parent->setRight(rightmost);
+			else root = rightmost;
+			if (rightmostParent != current) {
+				rightmostParent->setRight(rightmost->getLeft());
+				rightmost->setLeft(current->getLeft());
+			}
 			rightmost->setRight(current->getRight());
 			delete current;
 		}
 	}
 	else if (hasRight) {
-		if (targetIsLeftChild) parent->setLeft(current->getRight());
-		else parent->setRight(current->getRight());
+		if (targetIsLeftChild && parent != NULL) parent->setLeft(current->getRight());
+		else if (parent != NULL) parent->setRight(current->getRight());
+		else root = current->getRight();
 		delete current;
 	}
 	else {
-		if (targetIsLeftChild) parent->setLeft(NULL);
-		else parent->setRight(NULL);
+		if (targetIsLeftChild && parent != NULL) parent->setLeft(NULL);
+		else if (parent != NULL) parent->setRight(NULL);
+		else root = NULL;
 		delete current;
 	}
 
